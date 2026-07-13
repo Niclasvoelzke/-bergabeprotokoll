@@ -1197,15 +1197,15 @@ function buildPdf(){
     doc.setFontSize(8.5);
 
     function drawHeader(){
-      doc.setFillColor(...lightFill);
       doc.setDrawColor(198,210,232);
-      doc.setTextColor(...primary);
       doc.setFont(undefined,'bold');
       let x = MARGIN;
       const hH = 7;
       newPageIfNeeded(hH + lineH + rowPadding*2);
       columns.forEach(col=>{
+        doc.setFillColor(...lightFill);
         doc.rect(x, y, col.width, hH, 'FD');
+        doc.setTextColor(...primary);
         doc.text(col.header, x+2, y+4.8);
         x += col.width;
       });
@@ -1408,9 +1408,10 @@ function buildPdf(){
     doc.text('Fotoanhang', MARGIN, y);
     y += 10;
 
-    photoSlots.forEach((slot)=>{
+    photoSlots.forEach((slot, idx)=>{
       const img = slot.querySelector('img');
-      const caption = val(slot.querySelector('.photo-caption'));
+      const typedCaption = val(slot.querySelector('.photo-caption'));
+      const caption = typedCaption || ('Foto ' + (idx + 1));
 
       // determine natural image size to preserve aspect ratio
       const natW = img.naturalWidth || 1000;
@@ -1425,13 +1426,11 @@ function buildPdf(){
       }
 
       newPageIfNeeded(drawH + 14);
-      if(caption){
-        doc.setFontSize(10.5);
-        doc.setTextColor(...primary);
-        doc.setFont(undefined,'bold');
-        doc.text(caption, MARGIN, y+4);
-        y += 8;
-      }
+      doc.setFontSize(10.5);
+      doc.setTextColor(...primary);
+      doc.setFont(undefined,'bold');
+      doc.text(caption, MARGIN, y+4);
+      y += 8;
       const xCenter = MARGIN + (CW - drawW)/2;
       doc.addImage(img.src, xCenter, y, drawW, drawH, undefined, 'MEDIUM');
       y += drawH + 10;
