@@ -1046,17 +1046,34 @@ document.getElementById('heuteBtn').addEventListener('click', ()=>{
 function setupSigPad(canvas){
   const ctx = canvas.getContext('2d');
   let drawing = false, last = null;
+  let lastCssW = 0, lastCssH = 0;
 
   function resize(){
     const ratio = window.devicePixelRatio || 1;
     const rect = canvas.getBoundingClientRect();
-    const img = ctx.getImageData ? null : null;
+    // Nur neu skalieren, wenn sich die tatsächliche Größe geändert hat -
+    // verhindert unnötiges Löschen bei Tastatur-Ein-/Ausblenden etc.
+    if(Math.abs(rect.width - lastCssW) < 1 && Math.abs(rect.height - lastCssH) < 1){
+      return;
+    }
+    // Vorhandene Zeichnung sichern, bevor die Canvas-Größe (und damit ihr Inhalt) zurückgesetzt wird
+    let preserved = null;
+    if(canvas.width > 0 && canvas.height > 0){
+      try{ preserved = canvas.toDataURL('image/png'); }catch(e){}
+    }
+    lastCssW = rect.width;
+    lastCssH = rect.height;
     canvas.width = rect.width * ratio;
     canvas.height = rect.height * ratio;
     ctx.scale(ratio, ratio);
     ctx.lineWidth = 2;
     ctx.lineCap = 'round';
     ctx.strokeStyle = '#1C1C1C';
+    if(preserved){
+      const img = new Image();
+      img.onload = () => ctx.drawImage(img, 0, 0, rect.width, rect.height);
+      img.src = preserved;
+    }
   }
   resize();
   window.addEventListener('resize', resize);
