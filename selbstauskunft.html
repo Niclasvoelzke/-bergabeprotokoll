@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Immobilien Völzke">
 <link rel="icon" type="image/png" href="favicon-32.png">
-<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="apple-touch-icon" href="icon-180-v2.png">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#072C66">
 <meta name="robots" content="noindex">
@@ -55,6 +55,9 @@
   .btn-primary:hover{filter:brightness(0.95);}
   .btn-secondary{background:#fff;color:var(--primary);}
   .btn-ghost{background:rgba(255,255,255,0.12);color:#fff;}
+  .home-link{display:none;text-decoration:none;font-weight:600;font-size:15px;padding:8px 14px;border-radius:6px;}
+  @media (display-mode: standalone){ .home-link{display:inline-block;} }
+  .standalone .home-link{display:inline-block;}
   .btn-small{
     background:var(--bg-tint); color:var(--primary);
     border:1px solid var(--border); padding:6px 12px; font-size:12.5px;
@@ -152,6 +155,7 @@
   <div class="toolbar">
     <h2>Mieterselbstauskunft</h2>
     <div class="btns">
+      <a class="btn-ghost home-link" href="./">←</a>
       <button class="btn-ghost" id="resetBtn" type="button">Leeren</button>
       <span class="pdf-status" id="pdfStatus"></span>
       <button class="btn-secondary" id="saveBtn" type="button">PDF speichern</button>
@@ -700,6 +704,8 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var n,r,i,a,
 
 
 <script>
+if(window.navigator.standalone) document.documentElement.classList.add('standalone');
+
 // ---------- Rücksende-Adresse (hier eintragen) ----------
 const RETURN_EMAIL = 'Niclas.voelzke@rvhs.de';
 
