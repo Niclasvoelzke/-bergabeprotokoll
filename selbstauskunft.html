@@ -5,7 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Mieterselbstauskunft</title>
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="Selbstauskunft">
+<meta name="apple-mobile-web-app-title" content="Immobilien Völzke">
+<link rel="icon" type="image/png" href="favicon-32.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#072C66">
 <meta name="robots" content="noindex">
@@ -112,6 +114,20 @@
 
   footer.note{padding:18px 32px 30px;font-size:12px;color:var(--muted);text-align:center;line-height:1.5;}
 
+  .modal-bg{position:fixed;inset:0;background:rgba(7,44,102,0.55);display:none;align-items:center;justify-content:center;z-index:100;padding:16px;}
+  .modal-bg.open{display:flex;}
+  .modal{background:#fff;border-radius:12px;max-width:440px;width:100%;padding:22px;box-shadow:0 10px 40px rgba(0,0,0,0.25);}
+  .modal h3{margin:0 0 10px;color:var(--primary);font-size:18px;}
+  .modal p{margin:0 0 12px;font-size:14px;line-height:1.5;color:var(--text);}
+  .modal ol{margin:0 0 14px;padding-left:20px;font-size:14px;line-height:1.6;}
+  .rcpt{display:flex;gap:8px;align-items:center;background:var(--bg-tint);border:1px solid var(--border);border-radius:8px;padding:8px 10px;margin-bottom:14px;}
+  .rcpt b{flex:1;word-break:break-all;color:var(--primary);font-size:15px;}
+  .modal .actions{display:flex;flex-direction:column;gap:8px;}
+  .modal .actions button, .modal .actions a{width:100%;text-align:center;padding:12px;font-size:15px;border-radius:8px;text-decoration:none;font-weight:600;box-sizing:border-box;}
+  .modal .btn-main{background:var(--primary);color:#fff;}
+  .modal .btn-alt{background:var(--bg-tint);color:var(--primary);border:1px solid var(--border);}
+  .modal .btn-close{background:none;color:var(--muted);font-weight:400;}
+
   @media (max-width:640px){
     .grid, .persons, .sig-grid{grid-template-columns:1fr;}
     section.block{padding:18px 16px 4px;}
@@ -139,7 +155,7 @@
       <button class="btn-ghost" id="resetBtn" type="button">Leeren</button>
       <span class="pdf-status" id="pdfStatus"></span>
       <button class="btn-secondary" id="saveBtn" type="button">PDF speichern</button>
-      <button class="btn-primary" id="shareBtn" type="button">PDF senden</button>
+      <button class="btn-primary" id="shareBtn" type="button">Per E-Mail senden</button>
     </div>
   </div>
 
@@ -273,10 +289,35 @@
   </section>
 
   <footer class="note">
-    Mit dem Finger oder der Maus unterschreiben, dann oben auf <b>„PDF senden“</b> tippen und das PDF per E-Mail oder Messenger zurückschicken.
-    Alternativ <b>„PDF speichern“</b> und die Datei als Anhang senden. Ihre Eingaben werden nicht ins Internet übertragen, nur Ihr eigenes Gerät erstellt das PDF.
+    Mit dem Finger oder der Maus unterschreiben und oben auf <b>„Per E-Mail senden“</b> tippen.
+    Ihre Eingaben werden nicht ins Internet übertragen – das PDF entsteht auf Ihrem eigenen Gerät und Sie senden es selbst per E-Mail zurück.
   </footer>
 
+</div>
+
+<div class="modal-bg" id="mailModal">
+  <div class="modal">
+    <h3>Per E-Mail zurücksenden</h3>
+    <div class="rcpt" id="rcptRow"><b id="rcptAddr"></b><button class="btn-small" type="button" id="copyBtn">Kopieren</button></div>
+    <div id="modalShare">
+      <ol>
+        <li>Auf <b>„PDF teilen“</b> tippen und <b>Mail</b> auswählen.</li>
+        <li id="liRcpt1">Als Empfänger die Adresse oben eintragen und senden.</li>
+      </ol>
+    </div>
+    <div id="modalMailto">
+      <ol>
+        <li>Auf <b>„E-Mail öffnen“</b> tippen – das PDF wird dabei gespeichert.</li>
+        <li>Das gespeicherte PDF (<span id="fnHint"></span>) als Anhang einfügen und senden.</li>
+      </ol>
+    </div>
+    <div class="actions">
+      <button class="btn-main" type="button" id="doShare">📤 PDF teilen</button>
+      <a class="btn-main" id="doMailto" href="#">✉️ E-Mail öffnen</a>
+      <button class="btn-alt" type="button" id="doSave">Nur PDF speichern</button>
+      <button class="btn-close" type="button" id="doClose">Abbrechen</button>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -659,6 +700,9 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var n,r,i,a,
 
 
 <script>
+// ---------- Rücksende-Adresse (hier eintragen) ----------
+const RETURN_EMAIL = '';
+
 // ---------- Texte ----------
 const DECL_TEXT = 'Ich/Wir versichere(n), dass die vorstehenden Angaben vollständig und wahrheitsgemäß sind. Mir/uns ist bekannt, dass bewusst falsche Angaben zur Anfechtung oder Kündigung eines später abgeschlossenen Mietvertrags berechtigen können.';
 const DS_TEXT = 'Datenschutz: Die Angaben werden ausschließlich zur Prüfung der Mietanfrage und gegebenenfalls zur Durchführung des Mietverhältnisses verwendet (Art. 6 Abs. 1 lit. b DSGVO) und nicht an Dritte weitergegeben. Kommt kein Mietvertrag zustande, werden die Unterlagen spätestens nach 6 Monaten gelöscht.';
@@ -992,25 +1036,60 @@ document.getElementById('saveBtn').addEventListener('click', ()=>{
   catch(err){ console.error(err); alert('PDF-Erstellung fehlgeschlagen: ' + err.message); }
 });
 
-document.getElementById('shareBtn').addEventListener('click', async ()=>{
+// ---------- Per E-Mail zurücksenden ----------
+const modal = document.getElementById('mailModal');
+let current = null;
+function canShareFile(file){ try{ return !!(navigator.canShare && navigator.canShare({files:[file]})); }catch(e){ return false; } }
+
+document.getElementById('shareBtn').addEventListener('click', ()=>{
   if(!precheck()) return;
-  let r;
-  try{ r = buildPdf(); }
+  try{ current = buildPdf(); }
   catch(err){ console.error(err); alert('PDF-Erstellung fehlgeschlagen: ' + err.message); return; }
-  const file = new File([r.blob], r.filename, {type:'application/pdf'});
-  if(navigator.canShare && navigator.canShare({files:[file]})){
-    try{
-      await navigator.share({files:[file], title:'Mieterselbstauskunft'});
-      flash('Gesendet ✓');
-    }catch(err){
-      if(err && err.name === 'AbortError') return;
-      download(r.blob, r.filename);
-      flash('PDF gespeichert – bitte als Anhang senden');
-    }
-  } else {
-    download(r.blob, r.filename);
+  current.file = new File([current.blob], current.filename, {type:'application/pdf'});
+  const share = canShareFile(current.file);
+  document.getElementById('rcptRow').style.display = RETURN_EMAIL ? 'flex' : 'none';
+  document.getElementById('rcptAddr').textContent = RETURN_EMAIL;
+  document.getElementById('liRcpt1').style.display = RETURN_EMAIL ? '' : 'none';
+  document.getElementById('modalShare').style.display = share ? '' : 'none';
+  document.getElementById('doShare').style.display = share ? '' : 'none';
+  document.getElementById('modalMailto').style.display = share ? 'none' : '';
+  document.getElementById('doMailto').style.display = share ? 'none' : '';
+  document.getElementById('fnHint').textContent = current.filename;
+  const name = v('p1_name');
+  const subject = 'Mieterselbstauskunft' + (name ? ' – ' + name : '');
+  const body = 'Guten Tag,\n\nanbei meine ausgefüllte Mieterselbstauskunft als PDF.\n\nViele Grüße' + (name ? '\n' + name : '');
+  current.subject = subject; current.body = body;
+  document.getElementById('doMailto').href = 'mailto:' + encodeURIComponent(RETURN_EMAIL).replace('%40','@') +
+    '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
+  modal.classList.add('open');
+});
+document.getElementById('doShare').addEventListener('click', async ()=>{
+  try{
+    await navigator.share({files:[current.file], title: current.subject, text: current.body});
+    modal.classList.remove('open'); flash('Gesendet ✓');
+  }catch(err){
+    if(err && err.name === 'AbortError') return;
+    download(current.blob, current.filename);
     flash('PDF gespeichert – bitte als Anhang senden');
   }
+});
+document.getElementById('doMailto').addEventListener('click', ()=>{
+  download(current.blob, current.filename);
+  setTimeout(()=> modal.classList.remove('open'), 500);
+});
+document.getElementById('doSave').addEventListener('click', ()=>{
+  download(current.blob, current.filename); flash('PDF gespeichert ✓');
+});
+document.getElementById('doClose').addEventListener('click', ()=> modal.classList.remove('open'));
+modal.addEventListener('click', e=>{ if(e.target === modal) modal.classList.remove('open'); });
+document.getElementById('copyBtn').addEventListener('click', async ()=>{
+  const b = document.getElementById('copyBtn');
+  try{ await navigator.clipboard.writeText(RETURN_EMAIL); b.textContent = 'Kopiert ✓'; }
+  catch(e){
+    const r = document.createRange(); r.selectNodeContents(document.getElementById('rcptAddr'));
+    const s = getSelection(); s.removeAllRanges(); s.addRange(r); b.textContent = 'Markiert';
+  }
+  setTimeout(()=> b.textContent = 'Kopieren', 2000);
 });
 
 // ---------- Leeren ----------

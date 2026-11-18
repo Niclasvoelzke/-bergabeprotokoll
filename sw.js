@@ -2,11 +2,16 @@
 // Ziel: Nach dem ersten Öffnen funktioniert die Seite komplett offline,
 // auch nach Neustart des iPads oder Wochen ohne Internetverbindung.
 
-const CACHE_NAME = 'uebergabeprotokoll-v2';
+const CACHE_NAME = 'uebergabeprotokoll-v3';
 const FILES_TO_CACHE = [
   './',
   './index.html',
-  './selbstauskunft.html'
+  './selbstauskunft.html',
+  './manifest.json',
+  './apple-touch-icon.png',
+  './icon-192.png',
+  './icon-512.png',
+  './favicon-32.png'
 ];
 
 // Beim Installieren: Seite sofort in den Cache legen
