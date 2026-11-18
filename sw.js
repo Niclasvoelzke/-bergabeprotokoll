@@ -2,7 +2,7 @@
 // Ziel: Nach dem ersten Öffnen funktioniert die Seite komplett offline,
 // auch nach Neustart des iPads oder Wochen ohne Internetverbindung.
 
-const CACHE_NAME = 'uebergabeprotokoll-v5';
+const CACHE_NAME = 'uebergabeprotokoll-v6';
 const FILES_TO_CACHE = [
   './',
   './index.html',

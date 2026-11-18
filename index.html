@@ -76,6 +76,7 @@
 </div>
 
 <script>
+try{ sessionStorage.setItem('iv_hub','1'); }catch(e){}
 const LINK = new URL('selbstauskunft.html', location.href).href;
 const SUBJECT = 'Mieterselbstauskunft';
 const TEXT = 'Guten Tag,\n\nvielen Dank für Ihr Interesse an der Wohnung. Bitte füllen Sie die Mieterselbstauskunft unter folgendem Link aus und senden Sie sie direkt aus dem Formular per E-Mail zurück:\n\n' + LINK + '\n\nViele Grüße\nNiclas Völzke';
