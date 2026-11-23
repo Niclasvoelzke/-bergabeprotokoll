@@ -2,12 +2,14 @@
 // Ziel: Nach dem ersten Öffnen funktioniert die Seite komplett offline,
 // auch nach Neustart des iPads oder Wochen ohne Internetverbindung.
 
-const CACHE_NAME = 'uebergabeprotokoll-v7';
+const CACHE_NAME = 'uebergabeprotokoll-v8';
 const FILES_TO_CACHE = [
   './',
   './index.html',
   './uebergabeprotokoll.html',
   './selbstauskunft.html',
+  './nebenkosten.html',
+  './vendor/supabase-2.45.4.js',
   './icon-180-v2.png',
   './manifest.json',
   './apple-touch-icon.png',
@@ -42,14 +44,19 @@ self.addEventListener('activate', (event) => {
 // Strategie: Erst versuchen, frische Version aus dem Netz zu holen
 // (damit Updates ankommen, wenn Internet da ist). Klappt das nicht
 // (kein Internet), wird die zwischengespeicherte Version ausgeliefert.
+// Nur eigene App-Dateien (GET, gleiche Herkunft) werden zwischengespeichert.
+// Anfragen an Supabase (Login, Daten, Belege) gehen immer direkt ans Netz
+// und landen nie im Cache.
 self.addEventListener('fetch', (event) => {
+  const req = event.request;
+  if (req.method !== 'GET' || new URL(req.url).origin !== self.location.origin) return;
   event.respondWith(
-    fetch(event.request)
+    fetch(req)
       .then((response) => {
         const clone = response.clone();
-        caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
+        caches.open(CACHE_NAME).then((cache) => cache.put(req, clone));
         return response;
       })
-      .catch(() => caches.match(event.request).then((cached) => cached || caches.match('./index.html')))
+      .catch(() => caches.match(req).then((cached) => cached || caches.match('./index.html')))
   );
 });
