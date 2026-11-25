@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Nebenkosten · Immobilien Völzke</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="Immobilien Völzke">
+<meta name="theme-color" content="#0E0E0E">
+<meta name="robots" content="noindex">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/png" href="favicon-32.png">
+<link rel="apple-touch-icon" href="icon-180-v2.png">
+<style>
+  :root{ --bg:#0E0E0E; --card:#1A1A1A; --gold:#C9A24A; --gold-l:#E2C06E; --text:#F2F2F2; --muted:#9A9A9A; --err:#E07A6A; }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; min-height:100vh; background:var(--bg); color:var(--text);
+    font-family:-apple-system, "Segoe UI", Arial, sans-serif;
+    padding:calc(28px + env(safe-area-inset-top)) 18px 40px;
+  }
+  .wrap{max-width:560px;margin:0 auto;}
+  header{display:flex;align-items:center;gap:14px;margin-bottom:26px;}
+  header img{width:48px;height:48px;border-radius:12px;}
+  header h1{margin:0;font-size:22px;color:var(--gold-l);}
+  header p{margin:2px 0 0;color:var(--muted);font-size:13px;}
+  .back{display:inline-block;color:var(--gold-l);text-decoration:none;font-size:14px;margin-bottom:16px;}
+  .card{background:var(--card);border:1px solid #2A2A2A;border-radius:14px;padding:18px;margin-bottom:14px;}
+  .card h2{margin:0 0 6px;font-size:18px;}
+  .card p{margin:0 0 12px;font-size:13.5px;color:var(--muted);line-height:1.45;}
+  label{display:block;font-size:13px;color:var(--muted);margin:12px 0 6px;}
+  input{
+    width:100%; font:inherit; font-size:16px; padding:12px; border-radius:10px;
+    border:1px solid #333; background:#111; color:var(--text);
+  }
+  input:focus{outline:2px solid var(--gold);border-color:transparent;}
+  .btn{
+    display:block; width:100%; margin-top:16px; text-align:center; cursor:pointer;
+    font:inherit; font-size:15px; font-weight:600; padding:13px 14px; border-radius:10px; border:none;
+    background:var(--gold); color:#111;
+  }
+  .btn[disabled]{opacity:.6;cursor:default;}
+  .btn-line{background:transparent;color:var(--gold-l);border:1px solid var(--gold);}
+  .msg{font-size:13px;margin-top:12px;color:var(--err);}
+  .msg:empty{display:none;}
+  .link{background:none;border:none;color:var(--muted);font:inherit;font-size:12.5px;text-decoration:underline;cursor:pointer;padding:0;margin-top:10px;}
+  .hidden{display:none;}
+  /* Stammdaten */
+  .bar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:22px 0 10px;}
+  .card .bar{margin:0 0 6px;}
+  .h{margin:0;font-size:18px;}
+  h3.h{font-size:16px;color:var(--gold-l);}
+  .card h3{margin:0 0 4px;font-size:16px;}
+  .card.tap{display:block;color:inherit;text-decoration:none;}
+  .card.tap:active{background:#222;}
+  .card p.sub{margin:0 0 6px;}
+  .card p.meta{margin:2px 0 0;font-size:13.5px;color:var(--muted);}
+  .card.list{padding:6px 18px;}
+  .card.list > p{margin:10px 0;}
+  .btn-s{font:inherit;font-size:14px;font-weight:600;padding:8px 12px;border-radius:9px;border:1px solid var(--gold);background:transparent;color:var(--gold-l);cursor:pointer;white-space:nowrap;}
+  .tag{display:inline-block;font-size:11.5px;font-weight:500;color:var(--muted);border:1px solid #333;border-radius:6px;padding:1px 6px;vertical-align:middle;}
+  .warn{color:#E5A54B;}
+  .muted{color:var(--muted);font-size:13px;}
+  .center{text-align:center;}
+  .note{background:#141414;border-radius:8px;padding:8px 10px;margin:10px 0 0 !important;font-size:13px;}
+  .intro{font-size:13px !important;color:var(--muted);line-height:1.45;}
+  dl.kv{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;margin:10px 0 0;font-size:14px;}
+  dl.kv dt{color:var(--muted);} dl.kv dd{margin:0;}
+  .row-btn{display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:none;border:none;border-top:1px solid #2A2A2A;color:var(--text);font:inherit;font-size:14.5px;padding:12px 0;cursor:pointer;}
+  .card.list .row-btn:first-child, .card.list p + .row-btn{border-top:none;}
+  .row-btn small{display:block;color:var(--muted);font-size:12.5px;margin-top:2px;}
+  .row-btn .grow{flex:1;min-width:0;}
+  .chk{flex:none;width:24px;height:24px;border-radius:6px;border:1.5px solid #555;display:flex;align-items:center;justify-content:center;font-size:14px;color:#111;}
+  .chk.on{background:var(--gold);border-color:var(--gold);}
+  .link-btn{background:none;border:none;color:var(--gold-l);font:inherit;font-size:14px;padding:8px 0 0;cursor:pointer;text-decoration:underline;}
+  details.archiv{margin-bottom:14px;}
+  details.archiv summary{cursor:pointer;color:var(--muted);font-size:14px;padding:8px 0;}
+  input, select, textarea{color-scheme:dark;}
+  select, textarea{width:100%;font:inherit;font-size:16px;padding:12px;border-radius:10px;border:1px solid #333;background:#111;color:var(--text);}
+  .sheet-bg{position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:flex-end;justify-content:center;z-index:50;}
+  .sheet{background:var(--card);width:100%;max-width:560px;max-height:92vh;overflow-y:auto;border-radius:16px 16px 0 0;padding:18px 18px calc(24px + env(safe-area-inset-bottom));}
+  @media (min-width:700px){ .sheet-bg{align-items:center;} .sheet{border-radius:16px;} }
+  .sheet-head{display:flex;justify-content:space-between;align-items:center;}
+  .sheet-head h2{margin:0;font-size:18px;}
+  .x{background:none;border:none;color:var(--muted);font-size:28px;line-height:1;cursor:pointer;padding:0 4px;}
+  .field label.check{display:flex;align-items:center;gap:10px;color:var(--text);font-size:15px;margin:16px 0 4px;}
+  .field label.check input{width:22px;height:22px;}
+  .hint-s{font-size:12px;color:var(--muted);margin-top:5px;line-height:1.4;}
+  .btn-del{background:transparent;color:var(--err);border:1px solid #5a2e28;}
+  #nkToast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom));transform:translateX(-50%) translateY(20px);background:#2A2A2A;color:var(--text);padding:10px 16px;border-radius:10px;font-size:14px;opacity:0;transition:all .2s;pointer-events:none;z-index:60;max-width:90vw;}
+  #nkToast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+  #nkToast.err{background:#5a2e28;}
+  .userline{display:flex;justify-content:space-between;align-items:center;font-size:13px;color:var(--muted);margin-top:28px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="index.html">‹ Übersicht</a>
+  <header>
+    <img src="icon-180-v2.png" alt="">
+    <div>
+      <h1>Nebenkostenabrechnung</h1>
+      <p id="sub">Anmeldung erforderlich</p>
+    </div>
+  </header>
+
+  <div class="card hidden" id="offline">
+    <h2>Keine Internetverbindung</h2>
+    <p>Die Nebenkostenabrechnung braucht eine Internetverbindung. Übergabeprotokoll und Selbstauskunft funktionieren weiterhin offline.</p>
+    <button class="btn btn-line" type="button" onclick="location.reload()">Erneut versuchen</button>
+  </div>
+
+  <form class="card hidden" id="login" autocomplete="on">
+    <h2>Anmelden</h2>
+    <div id="emailBox">
+      <label for="email">E-Mail-Adresse</label>
+      <input id="email" type="email" autocomplete="username" autocapitalize="off" spellcheck="false" required>
+    </div>
+    <p id="emailKnown" class="hidden" style="margin:6px 0 0"></p>
+    <label for="pw">Kennwort</label>
+    <input id="pw" type="password" autocomplete="current-password" required>
+    <button class="btn" id="loginBtn" type="submit">Anmelden</button>
+    <div class="msg" id="loginMsg"></div>
+    <button class="link hidden" id="otherUser" type="button">Andere Person anmelden</button>
+  </form>
+
+  <div class="hidden" id="app">
+    <div id="nkRoot"></div>
+    <div class="userline"><span id="hello"></span><button class="link" id="logout" type="button" style="margin:0">Abmelden</button></div>
+  </div>
+</div>
+
+<script src="vendor/supabase-2.45.4.js"></script>
+<script src="nk-app.js"></script>
+<script>
+const SUPABASE_URL = 'https://xstheswxvclywbfadjmb.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_rfvDRTNmYizgpoCakU76Hw_KzA6qDpi'; // öffentlicher Schlüssel, Schutz über RLS
+const EMAIL_KEY = 'iv_nk_email';
+
+const $ = (id) => document.getElementById(id);
+const show = (id, on) => $(id).classList.toggle('hidden', !on);
+const store = {
+  get(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } },
+  set(k,v){ try{ localStorage.setItem(k,v); }catch(e){} },
+  del(k){ try{ localStorage.removeItem(k); }catch(e){} }
+};
+
+function showOffline(){ show('offline', true); show('login', false); show('app', false); $('sub').textContent = 'Offline'; }
+
+window.addEventListener('online', ()=> location.reload());
+
+if(!window.supabase || !navigator.onLine){
+  showOffline();
+} else {
+  const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
+    auth: { persistSession: true, autoRefreshToken: true }
+  });
+
+  function fillLoginForm(){
+    const saved = store.get(EMAIL_KEY);
+    $('email').value = saved || '';
+    show('emailBox', !saved);
+    show('emailKnown', !!saved);
+    show('otherUser', !!saved);
+    if(saved) $('emailKnown').textContent = 'Angemeldet wird: ' + saved;
+    $('pw').value = '';
+    $('loginMsg').textContent = '';
+  }
+
+  async function render(session){
+    if(!session){
+      fillLoginForm();
+      show('login', true); show('app', false);
+      $('sub').textContent = 'Anmeldung erforderlich';
+      return;
+    }
+    show('login', false); show('app', true);
+    const { data: profil } = await sb.from('profiles').select('anzeigename, rolle').eq('id', session.user.id).maybeSingle();
+    const name = profil && profil.anzeigename ? profil.anzeigename : session.user.email;
+    $('hello').textContent = 'Angemeldet: ' + name + (profil && profil.rolle === 'admin' ? ' (Verwaltung)' : '');
+    $('sub').textContent = 'Stammdaten';
+    if(!profil){ $('nkRoot').innerHTML = '<div class="card"><p>Dieses Konto ist nicht freigeschaltet.</p></div>'; return; }
+    NK.start(sb, profil, $('nkRoot'));
+  }
+
+  $('login').addEventListener('submit', async (e)=>{
+    e.preventDefault();
+    const email = $('email').value.trim().toLowerCase();
+    const password = $('pw').value;
+    $('loginBtn').disabled = true; $('loginMsg').textContent = '';
+    const { error } = await sb.auth.signInWithPassword({ email, password });
+    $('loginBtn').disabled = false;
+    if(error){
+      $('loginMsg').textContent = /fetch|network/i.test(error.message)
+        ? 'Keine Verbindung zum Server. Bitte Internet prüfen.'
+        : 'Anmeldung fehlgeschlagen. Bitte E-Mail und Kennwort prüfen.';
+      return;
+    }
+    store.set(EMAIL_KEY, email);
+  });
+
+  $('otherUser').addEventListener('click', ()=>{ store.del(EMAIL_KEY); fillLoginForm(); $('email').focus(); });
+  $('logout').addEventListener('click', ()=> sb.auth.signOut());
+
+  sb.auth.onAuthStateChange((_evt, session)=>{ setTimeout(()=>render(session), 0); });
+}
+
+if('serviceWorker' in navigator){
+  window.addEventListener('load', ()=> navigator.serviceWorker.register('./sw.js').catch(()=>{}));
+}
+</script>
+</body>
+</html>
