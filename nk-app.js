@@ -462,6 +462,7 @@ window.NK = (function(){
   return {
     start(client, prof, el){
       sb = client; profil = prof; root = el;
+      if(/access_token|type=/.test(location.hash)) history.replaceState(null, '', location.pathname);
       if(!started){ window.addEventListener('hashchange', route); started = true; }
       route();
     },

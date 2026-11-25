@@ -44,6 +44,8 @@
   .btn-line{background:transparent;color:var(--gold-l);border:1px solid var(--gold);}
   .msg{font-size:13px;margin-top:12px;color:var(--err);}
   .msg:empty{display:none;}
+  .ok{font-size:13px;margin-top:10px;color:var(--gold-l);line-height:1.45;}
+  .ok:empty{display:none;}
   .link{background:none;border:none;color:var(--muted);font:inherit;font-size:12.5px;text-decoration:underline;cursor:pointer;padding:0;margin-top:10px;}
   .hidden{display:none;}
   /* Stammdaten */
@@ -123,6 +125,19 @@
     <button class="btn" id="loginBtn" type="submit">Anmelden</button>
     <div class="msg" id="loginMsg"></div>
     <button class="link hidden" id="otherUser" type="button">Andere Person anmelden</button>
+    <br><button class="link" id="forgot" type="button">Kennwort vergessen?</button>
+    <div class="ok" id="forgotMsg"></div>
+  </form>
+
+  <form class="card hidden" id="newpw">
+    <h2>Neues Kennwort festlegen</h2>
+    <p>Bitte ein neues Kennwort mit mindestens 8 Zeichen eingeben.</p>
+    <label for="pw1">Neues Kennwort</label>
+    <input id="pw1" type="password" autocomplete="new-password" minlength="8" required>
+    <label for="pw2">Neues Kennwort wiederholen</label>
+    <input id="pw2" type="password" autocomplete="new-password" minlength="8" required>
+    <button class="btn" id="newpwBtn" type="submit">Kennwort speichern</button>
+    <div class="msg" id="newpwMsg"></div>
   </form>
 
   <div class="hidden" id="app">
@@ -148,6 +163,16 @@ const store = {
 
 function showOffline(){ show('offline', true); show('login', false); show('app', false); $('sub').textContent = 'Offline'; }
 
+// Link aus der E-Mail abgelaufen oder schon benutzt?
+let linkFehler = '';
+if(/error_code=|error=/.test(location.hash)){
+  linkFehler = /expired/.test(location.hash)
+    ? 'Der Link aus der E-Mail ist abgelaufen oder wurde schon benutzt. Bitte über „Kennwort vergessen?“ einen neuen anfordern.'
+    : 'Der Link aus der E-Mail funktioniert nicht. Bitte über „Kennwort vergessen?“ einen neuen anfordern.';
+  history.replaceState(null, '', location.pathname);
+}
+let recovering = /type=recovery/.test(location.hash);
+
 window.addEventListener('online', ()=> location.reload());
 
 if(!window.supabase || !navigator.onLine){
@@ -165,10 +190,17 @@ if(!window.supabase || !navigator.onLine){
     show('otherUser', !!saved);
     if(saved) $('emailKnown').textContent = 'Angemeldet wird: ' + saved;
     $('pw').value = '';
-    $('loginMsg').textContent = '';
+    $('loginMsg').textContent = linkFehler; linkFehler = '';
+    $('forgotMsg').textContent = '';
   }
 
   async function render(session){
+    show('newpw', false);
+    if(recovering && session){
+      show('login', false); show('app', false); show('newpw', true);
+      $('sub').textContent = 'Kennwort zurücksetzen';
+      return;
+    }
     if(!session){
       fillLoginForm();
       show('login', true); show('app', false);
@@ -200,10 +232,50 @@ if(!window.supabase || !navigator.onLine){
     store.set(EMAIL_KEY, email);
   });
 
+  $('forgot').addEventListener('click', async ()=>{
+    const email = $('email').value.trim().toLowerCase();
+    $('loginMsg').textContent = ''; $('forgotMsg').textContent = '';
+    if(!email){ show('emailBox', true); $('loginMsg').textContent = 'Bitte zuerst die E-Mail-Adresse eingeben.'; $('email').focus(); return; }
+    $('forgot').disabled = true;
+    const { error } = await sb.auth.resetPasswordForEmail(email, { redirectTo: location.origin + location.pathname });
+    $('forgot').disabled = false;
+    if(error){
+      $('loginMsg').textContent = /rate|seconds/i.test(error.message)
+        ? 'Zu viele Anfragen. Bitte ein paar Minuten warten und erneut versuchen.'
+        : 'Konnte keine E-Mail senden: ' + error.message;
+      return;
+    }
+    $('forgotMsg').textContent = 'Falls ein Konto zu ' + email + ' existiert, kommt gleich eine E-Mail. Den Link darin bitte auf diesem Gerät öffnen.';
+  });
+
+  $('newpw').addEventListener('submit', async (e)=>{
+    e.preventDefault();
+    const a = $('pw1').value, b = $('pw2').value;
+    $('newpwMsg').textContent = '';
+    if(a.length < 8){ $('newpwMsg').textContent = 'Bitte mindestens 8 Zeichen.'; return; }
+    if(a !== b){ $('newpwMsg').textContent = 'Die beiden Eingaben stimmen nicht überein.'; return; }
+    $('newpwBtn').disabled = true;
+    const { data, error } = await sb.auth.updateUser({ password: a });
+    $('newpwBtn').disabled = false;
+    if(error){
+      $('newpwMsg').textContent = /different|same/i.test(error.message) ? 'Das neue Kennwort muss sich vom alten unterscheiden.'
+        : /weak|short|characters/i.test(error.message) ? 'Das Kennwort ist zu schwach. Bitte ein längeres wählen.'
+        : 'Speichern fehlgeschlagen: ' + error.message;
+      return;
+    }
+    if(data && data.user && data.user.email) store.set(EMAIL_KEY, data.user.email);
+    recovering = false; $('pw1').value = $('pw2').value = '';
+    const { data: { session } } = await sb.auth.getSession();
+    render(session);
+  });
+
   $('otherUser').addEventListener('click', ()=>{ store.del(EMAIL_KEY); fillLoginForm(); $('email').focus(); });
   $('logout').addEventListener('click', ()=> sb.auth.signOut());
 
-  sb.auth.onAuthStateChange((_evt, session)=>{ setTimeout(()=>render(session), 0); });
+  sb.auth.onAuthStateChange((evt, session)=>{
+    if(evt === 'PASSWORD_RECOVERY') recovering = true;
+    setTimeout(()=>render(session), 0);
+  });
 }
 
 if('serviceWorker' in navigator){
