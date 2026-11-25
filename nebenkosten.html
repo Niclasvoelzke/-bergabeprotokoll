@@ -46,9 +46,52 @@
   .msg:empty{display:none;}
   .link{background:none;border:none;color:var(--muted);font:inherit;font-size:12.5px;text-decoration:underline;cursor:pointer;padding:0;margin-top:10px;}
   .hidden{display:none;}
-  .todo{list-style:none;margin:0;padding:0;}
-  .todo li{padding:10px 0;border-top:1px solid #2A2A2A;font-size:14px;color:var(--muted);}
-  .todo li:first-child{border-top:none;}
+  /* Stammdaten */
+  .bar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:22px 0 10px;}
+  .card .bar{margin:0 0 6px;}
+  .h{margin:0;font-size:18px;}
+  h3.h{font-size:16px;color:var(--gold-l);}
+  .card h3{margin:0 0 4px;font-size:16px;}
+  .card.tap{display:block;color:inherit;text-decoration:none;}
+  .card.tap:active{background:#222;}
+  .card p.sub{margin:0 0 6px;}
+  .card p.meta{margin:2px 0 0;font-size:13.5px;color:var(--muted);}
+  .card.list{padding:6px 18px;}
+  .card.list > p{margin:10px 0;}
+  .btn-s{font:inherit;font-size:14px;font-weight:600;padding:8px 12px;border-radius:9px;border:1px solid var(--gold);background:transparent;color:var(--gold-l);cursor:pointer;white-space:nowrap;}
+  .tag{display:inline-block;font-size:11.5px;font-weight:500;color:var(--muted);border:1px solid #333;border-radius:6px;padding:1px 6px;vertical-align:middle;}
+  .warn{color:#E5A54B;}
+  .muted{color:var(--muted);font-size:13px;}
+  .center{text-align:center;}
+  .note{background:#141414;border-radius:8px;padding:8px 10px;margin:10px 0 0 !important;font-size:13px;}
+  .intro{font-size:13px !important;color:var(--muted);line-height:1.45;}
+  dl.kv{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;margin:10px 0 0;font-size:14px;}
+  dl.kv dt{color:var(--muted);} dl.kv dd{margin:0;}
+  .row-btn{display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:none;border:none;border-top:1px solid #2A2A2A;color:var(--text);font:inherit;font-size:14.5px;padding:12px 0;cursor:pointer;}
+  .card.list .row-btn:first-child, .card.list p + .row-btn{border-top:none;}
+  .row-btn small{display:block;color:var(--muted);font-size:12.5px;margin-top:2px;}
+  .row-btn .grow{flex:1;min-width:0;}
+  .chk{flex:none;width:24px;height:24px;border-radius:6px;border:1.5px solid #555;display:flex;align-items:center;justify-content:center;font-size:14px;color:#111;}
+  .chk.on{background:var(--gold);border-color:var(--gold);}
+  .link-btn{background:none;border:none;color:var(--gold-l);font:inherit;font-size:14px;padding:8px 0 0;cursor:pointer;text-decoration:underline;}
+  details.archiv{margin-bottom:14px;}
+  details.archiv summary{cursor:pointer;color:var(--muted);font-size:14px;padding:8px 0;}
+  input, select, textarea{color-scheme:dark;}
+  select, textarea{width:100%;font:inherit;font-size:16px;padding:12px;border-radius:10px;border:1px solid #333;background:#111;color:var(--text);}
+  .sheet-bg{position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:flex-end;justify-content:center;z-index:50;}
+  .sheet{background:var(--card);width:100%;max-width:560px;max-height:92vh;overflow-y:auto;border-radius:16px 16px 0 0;padding:18px 18px calc(24px + env(safe-area-inset-bottom));}
+  @media (min-width:700px){ .sheet-bg{align-items:center;} .sheet{border-radius:16px;} }
+  .sheet-head{display:flex;justify-content:space-between;align-items:center;}
+  .sheet-head h2{margin:0;font-size:18px;}
+  .x{background:none;border:none;color:var(--muted);font-size:28px;line-height:1;cursor:pointer;padding:0 4px;}
+  .field label.check{display:flex;align-items:center;gap:10px;color:var(--text);font-size:15px;margin:16px 0 4px;}
+  .field label.check input{width:22px;height:22px;}
+  .hint-s{font-size:12px;color:var(--muted);margin-top:5px;line-height:1.4;}
+  .btn-del{background:transparent;color:var(--err);border:1px solid #5a2e28;}
+  #nkToast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom));transform:translateX(-50%) translateY(20px);background:#2A2A2A;color:var(--text);padding:10px 16px;border-radius:10px;font-size:14px;opacity:0;transition:all .2s;pointer-events:none;z-index:60;max-width:90vw;}
+  #nkToast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+  #nkToast.err{background:#5a2e28;}
+  .userline{display:flex;justify-content:space-between;align-items:center;font-size:13px;color:var(--muted);margin-top:28px;}
 </style>
 </head>
 <body>
@@ -83,21 +126,13 @@
   </form>
 
   <div class="hidden" id="app">
-    <div class="card">
-      <h2 id="hello">Willkommen</h2>
-      <p>Hier entsteht die Nebenkostenabrechnung. Die nächsten Bausteine:</p>
-      <ul class="todo">
-        <li>Objekte, Einheiten, Mietverhältnisse und Zähler</li>
-        <li>Belege hochladen und automatisch auslesen</li>
-        <li>Vorauszahlungen und Zählerstände</li>
-        <li>Abrechnung als PDF (Nebenkosten und Strom getrennt)</li>
-      </ul>
-    </div>
-    <button class="btn btn-line" id="logout" type="button">Abmelden</button>
+    <div id="nkRoot"></div>
+    <div class="userline"><span id="hello"></span><button class="link" id="logout" type="button" style="margin:0">Abmelden</button></div>
   </div>
 </div>
 
 <script src="vendor/supabase-2.45.4.js"></script>
+<script src="nk-app.js"></script>
 <script>
 const SUPABASE_URL = 'https://xstheswxvclywbfadjmb.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_rfvDRTNmYizgpoCakU76Hw_KzA6qDpi'; // öffentlicher Schlüssel, Schutz über RLS
@@ -143,8 +178,10 @@ if(!window.supabase || !navigator.onLine){
     show('login', false); show('app', true);
     const { data: profil } = await sb.from('profiles').select('anzeigename, rolle').eq('id', session.user.id).maybeSingle();
     const name = profil && profil.anzeigename ? profil.anzeigename : session.user.email;
-    $('hello').textContent = 'Willkommen, ' + name;
-    $('sub').textContent = profil && profil.rolle === 'admin' ? 'Angemeldet (Verwaltung)' : 'Angemeldet';
+    $('hello').textContent = 'Angemeldet: ' + name + (profil && profil.rolle === 'admin' ? ' (Verwaltung)' : '');
+    $('sub').textContent = 'Stammdaten';
+    if(!profil){ $('nkRoot').innerHTML = '<div class="card"><p>Dieses Konto ist nicht freigeschaltet.</p></div>'; return; }
+    NK.start(sb, profil, $('nkRoot'));
   }
 
   $('login').addEventListener('submit', async (e)=>{

@@ -2,13 +2,14 @@
 // Ziel: Nach dem ersten Öffnen funktioniert die Seite komplett offline,
 // auch nach Neustart des iPads oder Wochen ohne Internetverbindung.
 
-const CACHE_NAME = 'uebergabeprotokoll-v8';
+const CACHE_NAME = 'uebergabeprotokoll-v9';
 const FILES_TO_CACHE = [
   './',
   './index.html',
   './uebergabeprotokoll.html',
   './selbstauskunft.html',
   './nebenkosten.html',
+  './nk-app.js',
   './vendor/supabase-2.45.4.js',
   './icon-180-v2.png',
   './manifest.json',
